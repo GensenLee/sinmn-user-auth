@@ -3,7 +3,7 @@ package com.sinmn.user.auth.context;
 
 import com.sinmn.user.auth.vo.innerVO.UserInfoInnerVO;
 
-public class AppAuthContext {
+public class UserAuthContext {
 
 	private static ThreadLocal<String> sessionKeyHandle = new ThreadLocal<String>();
 	
@@ -14,7 +14,7 @@ public class AppAuthContext {
 	}
 
 	public static void setSessionKey(String sessionKey) {
-		AppAuthContext.sessionKeyHandle.set(sessionKey);
+		UserAuthContext.sessionKeyHandle.set(sessionKey);
 	}
 	
 	public static UserInfoInnerVO getUserInfoInnerVO() {
@@ -22,7 +22,7 @@ public class AppAuthContext {
 	}
 
 	public static void setUserInfoInnerVO(UserInfoInnerVO extUserInfoInnerVO) {
-		AppAuthContext.userInfoInnerVOHandle.set(extUserInfoInnerVO);
+		UserAuthContext.userInfoInnerVOHandle.set(extUserInfoInnerVO);
 	}
 
 	public static void clear(){

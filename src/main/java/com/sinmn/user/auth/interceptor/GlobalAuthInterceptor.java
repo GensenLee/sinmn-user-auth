@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.sinmn.core.utils.interceptor.AbstractInterceptor;
-import com.sinmn.user.auth.context.AppAuthContext;
+import com.sinmn.user.auth.context.UserAuthContext;
 
 public class GlobalAuthInterceptor extends AbstractInterceptor {
 
@@ -41,7 +41,7 @@ public class GlobalAuthInterceptor extends AbstractInterceptor {
 
 	@Override
 	public void afterCompletion(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, Exception arg3) throws Exception {
-		AppAuthContext.clear();
+		UserAuthContext.clear();
 
 	}
 
@@ -54,7 +54,7 @@ public class GlobalAuthInterceptor extends AbstractInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object arg2) throws Exception {
 		log.debug("[{} preHandle] 进入拦截器",this.getClass().getSimpleName());
-		AppAuthContext.clear();
+		UserAuthContext.clear();
 		String uri = request.getRequestURI();
 
 		if (exclude(uri)) {

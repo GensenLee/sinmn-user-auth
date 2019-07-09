@@ -5,7 +5,7 @@ import com.sinmn.core.utils.interceptor.AbstractInterceptor;
 import com.sinmn.core.utils.util.StringUtil;
 import com.sinmn.core.utils.vo.ApiResult;
 import com.sinmn.mjar.ext.core.UserExtCore;
-import com.sinmn.user.auth.context.AppAuthContext;
+import com.sinmn.user.auth.context.UserAuthContext;
 import com.sinmn.user.auth.redis.UserRedisDao;
 import com.sinmn.user.auth.vo.innerVO.UserInfoInnerVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class UserAuthInterceptor extends AbstractInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object arg2) throws Exception {
 		log.debug("[{} preHandle] 进入拦截器",this.getClass().getSimpleName());
 		
-		AppAuthContext.clear();
+		UserAuthContext.clear();
 		
 		String uri = request.getRequestURI();
 
@@ -80,8 +80,8 @@ public class UserAuthInterceptor extends AbstractInterceptor {
 		
 		UserInfoInnerVO userInfoInnerVO = userExtCore.getSession(sessionKey, UserInfoInnerVO.class);
 
-		AppAuthContext.setSessionKey(sessionKey);
-		AppAuthContext.setUserInfoInnerVO(userInfoInnerVO);
+		UserAuthContext.setSessionKey(sessionKey);
+		UserAuthContext.setUserInfoInnerVO(userInfoInnerVO);
 		
 		return true;
 	}
@@ -89,7 +89,7 @@ public class UserAuthInterceptor extends AbstractInterceptor {
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-		AppAuthContext.clear();
+		UserAuthContext.clear();
 		
 	}
 

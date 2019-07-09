@@ -2,13 +2,15 @@ package com.sinmn.user.auth.services;
 
 import com.sinmn.core.model.emun.ModelOperator;
 import com.sinmn.core.utils.exception.CommonException;
+import com.sinmn.core.utils.spring.SpringContextUtil;
 import com.sinmn.core.utils.util.BeanUtil;
 import com.sinmn.core.utils.util.IPUtil;
 import com.sinmn.core.utils.util.LongUtil;
 import com.sinmn.core.utils.util.StringUtil;
 import com.sinmn.core.utils.verify.VerifyUtil;
 import com.sinmn.mjar.ext.core.UserExtCore;
-import com.sinmn.user.auth.constant.AppAuthConstant;
+import com.sinmn.user.auth.constant.UserAuthConstant;
+import com.sinmn.user.auth.core.UserAuthCore;
 import com.sinmn.user.auth.model.User;
 import com.sinmn.user.auth.model.UserLoginLog;
 import com.sinmn.user.auth.redis.UserRedisDao;
@@ -45,6 +47,9 @@ public class UserService {
 	@Autowired
 	private UserRedisDao userRedisDao;
 
+	@Autowired
+	private UserAuthCore userAuthCore;
+
 	private static String targetIp;
 
 	static {
@@ -76,7 +81,7 @@ public class UserService {
 			throw new CommonException("账号错误");
 		}
 
-		if(user.getIsActive() == AppAuthConstant.Common.NO){
+		if(user.getIsActive() == UserAuthConstant.Common.NO){
 			throw new CommonException("账号已经被冻结，请联系管理员激活账号");
 		}
 
@@ -86,7 +91,7 @@ public class UserService {
 
 		userLoginLog.setCompanyId(user.getCompanyId());
 		userLoginLog.setCreateTime(new Date());
-		userLoginLog.setStatus(AppAuthConstant.Common.NO);
+		userLoginLog.setStatus(UserAuthConstant.Common.NO);
 		userLoginLog.setTargetIp(targetIp);
 		userLoginLog.setUserId(user.getId());
 		userLoginLog.setIp(IPUtil.getIpAddr(req));
@@ -96,7 +101,7 @@ public class UserService {
 		if(!PasswdUtil.getPasswd(loginInVO.getPasswd(), user.getPasswdSuffix()).equals(user.getPasswd())){
             user.setTryCount(user.getTryCount() + 1);
 			if(user.getTryCount() >= 6){
-                user.setIsActive(AppAuthConstant.Common.NO);
+                user.setIsActive(UserAuthConstant.Common.NO);
 			}
 			userRepository.include(User.TRY_COUNT,User.IS_ACTIVE).update(user);
 			String message = "";
@@ -122,13 +127,12 @@ public class UserService {
 		Map<String,Object> mapResult = new HashMap<String, Object>();
 		
 		//登陆
-        //保存会话
-        userExtCore.holdSeesion(sessionKey,userInfoInnerVO.toJsonString());
+        userAuthCore.manageSession(user.getId(),userInfoInnerVO);
 		mapResult.put("userId", user.getId());
 		mapResult.put("userName", user.getName());
 		mapResult.put("sessionKey", sessionKey);
 		
-		userLoginLog.setStatus(AppAuthConstant.Common.YES);
+		userLoginLog.setStatus(UserAuthConstant.Common.YES);
 		userLoginLogRepository.insert(userLoginLog);
 		
 		
@@ -138,12 +142,12 @@ public class UserService {
 	public Object save(User user, UserInfoInnerVO userInfoInnerVO) throws CommonException{
 		VerifyUtil.verify(user);
 		user.setCompanyId(userInfoInnerVO.getCompanyId());
-		user.setIsAdmin(AppAuthConstant.Common.NO);
+		user.setIsAdmin(UserAuthConstant.Common.NO);
 		if(LongUtil.isNotZero(user.getId())){
 			User orgAuthUser = userRepository
 				.where(User.COMPANY_ID,user.getCompanyId())
 				.where(User.ID,user.getId()).get();
-			if(orgAuthUser == null || orgAuthUser.getIsAdmin() == AppAuthConstant.Common.YES){
+			if(orgAuthUser == null || orgAuthUser.getIsAdmin() == UserAuthConstant.Common.YES){
 				throw new CommonException("无此用户权限");
 			}
 			user.setPasswd(null);
@@ -192,7 +196,7 @@ public class UserService {
 		}
 
 		
-		user.setIsAdmin(AppAuthConstant.Common.NO);
+		user.setIsAdmin(UserAuthConstant.Common.NO);
 		userRepository.save(user);
 		
 		return user;
@@ -208,7 +212,7 @@ public class UserService {
 			throw new CommonException("密码输入错误次数过多，账号已经被封停，请联系系统管理人员解封");
 		}
 		
-		if(user.getIsActive() == AppAuthConstant.Common.NO){
+		if(user.getIsActive() == UserAuthConstant.Common.NO){
 			throw new CommonException("账号已经被冻结，请联系管理员激活账号");
 		}
 		

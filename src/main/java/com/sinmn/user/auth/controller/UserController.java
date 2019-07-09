@@ -2,7 +2,7 @@ package com.sinmn.user.auth.controller;
 
 import com.sinmn.core.utils.exception.CommonException;
 import com.sinmn.core.utils.vo.ApiResult;
-import com.sinmn.user.auth.context.AppAuthContext;
+import com.sinmn.user.auth.context.UserAuthContext;
 import com.sinmn.user.auth.services.UserService;
 import com.sinmn.user.auth.vo.inVO.LoginInVO;
 import com.sinmn.user.auth.vo.inVO.RepasswdInVO;
@@ -30,7 +30,7 @@ public class UserController {
 	public ApiResult<Object> rePasswd(@RequestBody RepasswdInVO extUserRepasswdInVO)
 			throws CommonException
 	{
-		return ApiResult.getSuccess(userService.rePasswd(extUserRepasswdInVO, AppAuthContext.getUserInfoInnerVO()));
+		return ApiResult.getSuccess(userService.rePasswd(extUserRepasswdInVO, UserAuthContext.getUserInfoInnerVO()));
 	}
 	
 }

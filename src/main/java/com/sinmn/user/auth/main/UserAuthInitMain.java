@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Lazy(false)
 @Data
-public class AppAuthInitMain extends AbstractModelMain {
+public class UserAuthInitMain extends AbstractModelMain {
 
 	
 	@ModelAutowired
